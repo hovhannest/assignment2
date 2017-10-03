@@ -12,6 +12,7 @@ You are supposed to write a program, which does the following
 ** wait()
 ** exec() family functions (evecvp, execle, etc)
 in order to execute a given program.
+```
 
                      Prompt <---------------------------------|
 					    |                                     |
@@ -38,3 +39,5 @@ in order to execute a given program.
 	    |                print an error
 	    |                       |
 		     child exits.
+
+```
