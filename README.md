@@ -14,30 +14,30 @@ You are supposed to write a program, which does the following
 in order to execute a given program.
 ```
 
-                     Prompt <---------------------------------|
-					    |                                     |
-				     Input received                           |
-					    |                                     |
-					  fork()                                  |
-					    |                                     |
-				  is this program a child?                    |
-		   yes  |                         | no                |
-		        |                         |                   |
-			execute the                wait for the child     |
-			given program              process to end         |
-			with arguments             with wait()            |
-		by using execvp or                |                   |
-		 its friends.                     --------------------| 
-				|
-			    |
-                |
-			was exec family function
-			able to run the other
-			process?
-	yes |                       | no
-	    |                       |
-	    |                print an error
-	    |                       |
-		     child exits.
+				 Prompt <---------------------------------|
+					|                                     |
+				 Input received                           |
+					|                                     |
+				  fork()                                  |
+					|                                     |
+			  is this program a child?                    |
+	   yes  |                         | no                |
+			|                         |                   |
+		execute the                wait for the child     |
+		given program              process to end         |
+		with arguments             with wait()            |
+	by using execvp or                |                   |
+	 its friends.                     --------------------| 
+			|
+			|
+			|
+		was exec family function
+		able to run the other
+		process?
+ yes |                       | no
+   	 |                       |
+ 	 |                print an error
+	 |                       |
+		 child exits.
 
 ```
