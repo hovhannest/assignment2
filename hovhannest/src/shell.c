@@ -49,6 +49,11 @@ int main(int argc, char **argv, char** envp) {
 		int l = strlen(inp);
 		if(l <= 0 || l >= 100)
 			continue;
+		int bkg_task = 0;
+		if(inp[l-2] == '&'){
+			bkg_task = 1;
+			inp[l-2] = 0;
+		}
 		exitshell = exitShell(inp);
 		char **input = mytoc(inp,'\n');
 		char **command;
@@ -116,11 +121,16 @@ int main(int argc, char **argv, char** envp) {
 		}
 		int status;
 
-		waitpid(child,&status,0);
+		if(bkg_task == 0) {
+			waitpid(child,&status,0);
+		}
+		else {
+			setsid();
+		}
+
 
 		if(child == 0){
-			if(exitshell && commandExecuted == 0)
-			{
+			if(exitshell && commandExecuted == 0) {
 				fprintf(stdout, "Command not found\n");
 			}
 			exit(1);
