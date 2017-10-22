@@ -5,20 +5,9 @@
 #include <sys/wait.h>
 #include <memory.h>
 
-//void print_stream();
-/*
-	To Be Done
-	Tokenizing args
-	Sending to Background with & 
-	Commands in Path or in current directory
-	Command Realization (?)
-		fork
-		wait if not background function
-		exec() family for executing
-	
+int execute_command( char* args[], int count);
 
-*/
-char* join(char* first,char* second)
+char* join(char* first,char* second)							// retursn result consisted of joined  strings (i.e char* s)
 {
 	char* result = (char*) malloc(strlen(first) + strlen(second) + 1);
 	strcpy(result, first);
@@ -38,25 +27,25 @@ int execute_command( char* args[], int count)
 	int bBG =0 ;				// boolean BG is true when process is background
 
 
-	if(strcmp(args[count-1],"&")==0)	// we check if program should be ran
+	if(strcmp(args[count-1],"&")==0)	// we check if program should be ran in the background
 	{
 		bBG= 1;
 		args[count-1] =NULL;
 	}
 
-	int succeeded =0;				
+	int succeeded =0;					// if it isn't 1 then we try other path libraries			
 
 	pid = fork();
 	if(pid == 0)
 	{
-		char* dirName = strtok(path, ":");
+		char* dirName = strtok(path, ":");	//tokenizing using the symbol :
 
-		while(dirName != NULL)
+		while(dirName != NULL)				// basically we go over all libraries in Path
 		{
-			char* cmndName = join(join(dirName,"/"),args[0]);
+			char* cmndName = join(join(dirName,"/"),args[0]); 
 			int res = execvp(cmndName, args);
 			free(cmndName);
-			if(res != -1)
+			if(res != -1)					// if not -1 we suceeded to find the command
 			{
 				succeeded = 1;
 				dirName == NULL;
@@ -64,9 +53,9 @@ int execute_command( char* args[], int count)
 			if(dirName!=NULL)
 				dirName = strtok(NULL,":");
 		}
-		if(succeeded == 0)
+		if(succeeded == 0)					// no libraries in PATH fit we look in our current directory
 		{
-			char* dirName = getenv("PWD");
+			char* dirName = getenv("PWD");	
 			char* cmndName = join(join(dirName,"/"),args[0]);
 			int res = execvp(cmndName, args);
 			if(res != -1)
@@ -75,20 +64,20 @@ int execute_command( char* args[], int count)
 			free(cmndName);
 		}
 
-		if(succeeded == 0)
+		if(succeeded == 0)					// Command wasn't found in any library inside PATH or in the current directory
 		{
 			perror("Invalid command");
 		}
 
 		exit(EXIT_FAILURE);
 	}
-	else if(pid < 0)
+	else if(pid < 0)						// Fork failed
 	{
 		perror("Unfortunately shell wasn't able to fork :'(");
 	}
 	else
 	{
-		if(!bBG)
+		if(!bBG)					// if it wasn't a backgroudn process we have to wait until it finishes.
 		{
 			do
 			{
@@ -105,10 +94,10 @@ int execute_command( char* args[], int count)
 }
 
 
-char** to_arrays( char* str )
+char** to_arrays( char* str )						// Tokenizing function. 
 {
 	const int CHUNK = 256;
-	int buff_size = CHUNK;
+	int buff_size = CHUNK;						// We define chunks and if the chanks are not enough we add more tu buff_size
 
 	char* arg = strtok(str, " \t\r\n\a");
 	char** strings = malloc(CHUNK * sizeof(char*));
@@ -125,10 +114,13 @@ char** to_arrays( char* str )
 		arg = strtok(NULL, " \t\r\n\a");
 	}
 	strings[n] = NULL;
-	return strings;
+	return strings;								// returns an array of strings with cmnd Name as first argument.
 }
 /*
-void to_arrays( char* strings[], char* string , size_t size )
+void to_arrays( char* strings[], char* string , size_t size )	// my initial tokenizer. After spending ours on lookinf for a bug I found out that it 
+																//was the main source of an error. SOmething in the strings is broken
+																// I suspect its strndup even though in internet it was said it takes care of memory allocation
+																// and null termination it is probably doesn't. If there is time I will fix and go back to it.
 {
 	
 	int i = 0; 
@@ -158,7 +150,7 @@ void to_arrays( char* strings[], char* string , size_t size )
   
 }*/
 
-char* input_to_string()		// rewrite using read!!
+char* input_to_string()		// makes a string from the input. since fgets is not the best option it uses it. Maybe I will rewrite it using read.
 {
    char* str = NULL;
    char tbuf[200];
@@ -173,7 +165,7 @@ char* input_to_string()		// rewrite using read!!
     return str;
 }
 
-void input_handler()
+int input_handler()		// handles input. Also runs the execute commands. 
 {	
 	fflush(stdout);
 		printf("\n");
@@ -189,33 +181,21 @@ void input_handler()
 	}
 	char** strings;
 	strings = to_arrays(str);
-
-
-		//to_arrays(strings, str, count);
-		//printf("%d \n",count);
-
-//	for(int i = 0; i < count; i++) 
-		printf("%s \n",strings[0]);
-	//print_string();
- 	int exitStatus = execute_command(strings,count);
-	/*free(str);
-
-
-	for(int i = 0; i < count; i++) // make sure it is done in the end not necessarily here
-			free(strings[i]);
-	*/
+	if(strcmp(strings[0],"breakFree")==0)
+		return -5;
+	int exitStatus = execute_command(strings,count);
+	
 	//input_handler();
 	return;
 }
 
-int main()
+int main()		
 {
-	printf(" \n Simple Shell successfully initiated\n$");
+	printf(" \n Simple Shell successfully initiated. Enter breakFree to exit.\n$");
 	
 	//char* cmndName;
 	//char* args[];
-	while(1)
-	input_handler();	
+	while( input_handler() != -5);	
 	
 	//free(test);
 	/*char* str = input_to_string();
