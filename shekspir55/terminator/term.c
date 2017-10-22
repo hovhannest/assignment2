@@ -25,8 +25,9 @@ int main(int argc, char *argv[]) {
 
         while (fgets(str, sizeof(str), stdin) != NULL) {
             str[strcspn(str, "\n")] = '\0';  // strip the newline if present
-            if (!strcmp(str, "q"));
-            break;
+            if (!strcmp(str, "exit")){
+                return;
+            }
         }
 
 
