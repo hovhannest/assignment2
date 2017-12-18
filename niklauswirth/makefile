@@ -1,3 +1,3 @@
 run:
-	gcc -o my_shell_exec my_shell.c
-	./my_shell_exec
+	gcc -o mj_shell_exec mj_shell.c
+	./mj_shell_exec
