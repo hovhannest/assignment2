@@ -30,10 +30,10 @@ int num_builtins() {
 int new_cd(char **args)
 {
   if (args[1] == NULL) {
-    fprintf(stderr, "cuteshell: expected argument to \"cd\"\n");
+    fprintf(stderr, "<3: Too few arguments to  \"cd\"\n");
   } else {
     if (chdir(args[1]) != 0) {
-      perror("cuteshell");
+      perror("<3");
     }
   }
   return 1;
@@ -43,9 +43,8 @@ int new_cd(char **args)
 int new_help(char **args)
 {
   int i;
-  
-  printf("Cute shell\n");
-  printf("Here are the built-in commands you can use:\n");
+
+  printf("Here are the commands that you can use:\n");
 
   for (i = 0; i < num_builtins(); i++) {
     printf("  %s\n", builtin_comm[i]);
@@ -61,24 +60,22 @@ int new_exit(char **args)
 }
 
 
-int cute_launch(char **args)
+int launch(char **args)
 {
   
     int status;
 
-    //pid_t parent = getpid();
     pid_t child = fork();
 
     if(child == 0)
     {
       if (execvp(args[0], args) == -1) {
-      perror("cuteshell");
+       perror("<3");
     }
     exit(EXIT_FAILURE);
     }
     else 
     {
-    // if the process is a Parent process
       do {
           waitpid(child, &status, WUNTRACED);
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
@@ -88,7 +85,7 @@ int cute_launch(char **args)
 }
 
 
-int cute_execute(char **args)
+int execute(char **args)
 {
   int i;
 
@@ -113,12 +110,12 @@ int cute_execute(char **args)
     
   }
 
-  return cute_launch(args);
+  return launch(args);
 }
 
 
 
-char *cute_read_line(void)
+char *read_line(void)
 {
   char *line = NULL;
   ssize_t buffersize = 0;
@@ -127,7 +124,7 @@ char *cute_read_line(void)
 }
 
 
-char **cute_split_line(char *line)
+char **split_line(char *line)
 {
   int bufsize = 64, position = 0;
   char **tokens = malloc(bufsize * sizeof(char*));
@@ -146,22 +143,21 @@ char **cute_split_line(char *line)
 }
 
 
-void cute_loop(void)
+void _main(void)
 {
   char *line;
   char **args;
   int status;
-  printf("\e[H\e[2J");
-  printf("\e[1;32m");
-  printf("\\\n \\ji\n /.(((\n(,/\"(((___,--.\n      \\ ) __(/{\n      !||\" :||\n      !||  :||\n");
 
-  printf("WELCOME TO THE CUTE ^.^ SHELL: For exit type 'exit'.\n");
+  printf("\e[H\e[2J");
+ 
+  printf("Welcome to myShell <3: To see your options please type 'help', if you wish to exit the shell please type 'exit'.\n");
 
   do {
-    printf("^.^ ");
-    line = cute_read_line();
-    args = cute_split_line(line);
-    status = cute_execute(args);
+    printf("<3  ");
+    line = read_line();
+    args = split_line(line);
+    status = execute(args);
 
    
   } while (status);
@@ -171,7 +167,7 @@ void cute_loop(void)
 int main(int argc, char **argv)
 {
 
-  cute_loop();
+  _main();
 
   return EXIT_SUCCESS;
 }
